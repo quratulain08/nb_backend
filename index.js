@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import productRoutes from "./routes/products.js";
+import authRoutes from "./routes/auth.js";
+
+
 
 dotenv.config();
 const app = express();
@@ -10,15 +13,22 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ Connected to MongoDB Atlas");
+    console.log("📊 Database: PRODUCTLIST");
+    console.log("🌐 Cluster: NadirBrothersClusters");
+    console.log("📸 Images: Cloudinary");
   })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB Atlas connection error:", err);
+    console.error("💡 Check your credentials and IP whitelist");
+    process.exit(1);
+  });
 
 // Routes
 app.use("/api/products", productRoutes);
